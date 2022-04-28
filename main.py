@@ -6,7 +6,7 @@ import json
 import serial.tools.list_ports
 
 mess = ""
-bbc_port = "COM3"
+bbc_port = ""
 if len(bbc_port) > 0:
     ser = serial.Serial(port=bbc_port, baudrate=115200)
 
@@ -54,16 +54,16 @@ def recv_message(client, userdata, message):
     try:
         jsonobj = json.loads(message.payload)
         if jsonobj['method'] == "setLed":
-            temp_data['value'] = jsonobj['params']
-            # client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
-            client.publish('v1/devices/me/Button-Led-again', json.dumps(temp_data), 1)
+            temp_data['Led'] = jsonobj['params']
+            temp_data['setLed'] = jsonobj['params']
             cmd = 1 if jsonobj['params'] else 0 
-            print("cmd test", cmd)
+            # print("cmd test", cmd)
         elif jsonobj['method'] == "setPump":
-            temp_data['value'] = jsonobj['params']
-            # client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
+            temp_data['Pump'] = jsonobj['params']
+            temp_data['setPump'] = jsonobj['params']
             client.publish('v1/devices/me/Button-Pump', json.dumps(temp_data), 1)
             cmd = 2 if jsonobj['params'] else 3 
+        client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
     except:
         pass
     if len(bbc_port) > 0:
@@ -128,4 +128,4 @@ while True:
     # time.sleep(10)
     if len(bbc_port) > 0:
         readSerial()
-    time.sleep(1)
+    # time.sleep(1)
